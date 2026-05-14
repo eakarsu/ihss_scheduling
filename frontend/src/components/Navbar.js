@@ -84,6 +84,19 @@ export default function Navbar({ onLogout, features }) {
         <span style={styles.brandText}>IHSS Scheduling</span>
       </div>
       <div style={styles.menuContainer}>
+        <div
+          key="ai-dashboard"
+          style={styles.menuItem(location.pathname === '/ai-dashboard', '#8b5cf6')}
+          onClick={() => navigate('/ai-dashboard')}
+          onMouseEnter={(e) => { e.target.style.background = '#8b5cf615'; e.target.style.color = '#8b5cf6'; }}
+          onMouseLeave={(e) => {
+            const active = location.pathname === '/ai-dashboard';
+            e.target.style.background = active ? '#8b5cf622' : 'transparent';
+            e.target.style.color = active ? '#8b5cf6' : '#94a3b8';
+          }}
+        >
+          🧠 AI Dashboard
+        </div>
         {features.map((f) => (
           <div
             key={f.key}

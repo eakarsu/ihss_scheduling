@@ -28,4 +28,24 @@ Please provide:
   res.json(aiResult);
 });
 
+// Audit-driven addition: "Compliance violation early warning".
+router.post('/ai-early-warning', auth, async (req, res) => {
+  const { store_name, state, upcomingShifts, employees, recentViolations } = req.body || {};
+  const systemPrompt = `You are a labor-law compliance early-warning agent. Given upcoming shifts and employee context, predict likely compliance violations BEFORE they occur. Respond with strict JSON only of the form: {"warnings": [{"shift_id": <id-or-null>, "employee_id": <id-or-null>, "rule": <string>, "likelihood": "low|medium|high", "predicted_violation_date": <iso-date-or-null>, "preventive_action": <string>}], "summary": <string>, "high_risk_employees": [<ids>]}.`;
+  const userPrompt = `Store: ${store_name || 'unspecified'}
+State: ${state || 'unspecified'}
+
+Upcoming shifts (next 14d):
+${JSON.stringify(upcomingShifts || [], null, 2)}
+
+Employees:
+${JSON.stringify(employees || [], null, 2)}
+
+Recent violations (for trend context):
+${JSON.stringify(recentViolations || [], null, 2)}`;
+
+  const aiResult = await aiQuery(systemPrompt, userPrompt);
+  res.json(aiResult);
+});
+
 module.exports = router;
