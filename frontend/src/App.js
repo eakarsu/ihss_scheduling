@@ -3,6 +3,8 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import FeaturePage from './pages/FeaturePage';
+import AIDashboardPage from './pages/AIDashboardPage';
+import CustomViewsPage from './pages/CustomViewsPage';
 import Navbar from './components/Navbar';
 
 const globalStyles = `
@@ -31,7 +33,8 @@ const features = [
     tableColumns: ['store_number','name','district_name','city','state','store_manager','status'] },
   { key: 'employees', label: 'Employees', icon: '👥', color: '#10b981', api: '/employees',
     columns: ['employee_id','first_name','last_name','email','phone','role','department','store_name','district_name','hire_date','hourly_rate','employment_type','status'],
-    tableColumns: ['employee_id','first_name','last_name','role','department','store_name','status'] },
+    tableColumns: ['employee_id','first_name','last_name','role','department','store_name','status'],
+    ai: { endpoint: '/employees/ai-turnover-risk', fields: ['employee_id','tenure_months','recent_signals','context'], title: 'AI Staff Turnover Risk' } },
   { key: 'shifts', label: 'AI Shift Scheduling', icon: '📅', color: '#f59e0b', api: '/shifts',
     columns: ['store_name','employee_name','role','shift_date','start_time','end_time','hours','break_minutes','department','status','notes'],
     tableColumns: ['store_name','employee_name','shift_date','start_time','end_time','hours','status'],
@@ -64,7 +67,8 @@ const features = [
     tableColumns: ['employee_name','training_name','category','required_by','score','status'] },
   { key: 'performance', label: 'Performance', icon: '⭐', color: '#eab308', api: '/performance',
     columns: ['employee_name','store_name','review_period','reviewer','overall_rating','attendance_score','productivity_score','teamwork_score','goals','strengths','improvements','status'],
-    tableColumns: ['employee_name','store_name','review_period','overall_rating','attendance_score','productivity_score','status'] },
+    tableColumns: ['employee_name','store_name','review_period','overall_rating','attendance_score','productivity_score','status'],
+    ai: { endpoint: '/performance/ai-predict', fields: ['employee_id','review_period','recent_metrics','context'], title: 'AI Worker Performance Prediction' } },
   { key: 'incidents', label: 'Incidents', icon: '🚨', color: '#dc2626', api: '/incidents',
     columns: ['store_name','incident_type','description','severity','location','reported_by','date_reported','date_resolved','corrective_action','status','notes'],
     tableColumns: ['store_name','incident_type','severity','date_reported','status'] },
@@ -75,6 +79,10 @@ const features = [
     columns: ['store_name','compliance_type','regulation','description','audit_date','auditor','result','corrective_action','deadline','status','notes'],
     tableColumns: ['store_name','compliance_type','regulation','result','deadline','status'],
     ai: { endpoint: '/labor-compliance/ai-audit', fields: ['store_name','state','employee_count','issues'], title: 'AI Labor Compliance Audit' } },
+  { key: 'compliance-early-warning', label: 'AI Compliance Early Warning', icon: '⚠️', color: '#d97706', api: '/labor-compliance',
+    columns: ['store_name','compliance_type','regulation','description','audit_date','auditor','result','corrective_action','deadline','status','notes'],
+    tableColumns: ['store_name','compliance_type','regulation','result','deadline','status'],
+    ai: { endpoint: '/labor-compliance/ai-early-warning', fields: ['store_name','employee_id','signals','lookback_days'], title: 'AI Compliance Violation Early Warning' } },
 ];
 
 function App() {
@@ -101,6 +109,8 @@ function App() {
         <Routes>
           <Route path="/login" element={isAuth ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
           <Route path="/" element={isAuth ? <Dashboard features={features} /> : <Navigate to="/login" />} />
+          <Route path="/ai-dashboard" element={isAuth ? <AIDashboardPage /> : <Navigate to="/login" />} />
+          <Route path="/custom-views" element={isAuth ? <CustomViewsPage /> : <Navigate to="/login" />} />
           {features.map((f) => (
             <Route key={f.key} path={`/${f.key}`} element={isAuth ? <FeaturePage feature={f} /> : <Navigate to="/login" />} />
           ))}

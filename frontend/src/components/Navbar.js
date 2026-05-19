@@ -84,6 +84,33 @@ export default function Navbar({ onLogout, features }) {
         <span style={styles.brandText}>IHSS Scheduling</span>
       </div>
       <div style={styles.menuContainer}>
+        <div
+          key="ai-dashboard"
+          style={styles.menuItem(location.pathname === '/ai-dashboard', '#8b5cf6')}
+          onClick={() => navigate('/ai-dashboard')}
+          onMouseEnter={(e) => { e.target.style.background = '#8b5cf615'; e.target.style.color = '#8b5cf6'; }}
+          onMouseLeave={(e) => {
+            const active = location.pathname === '/ai-dashboard';
+            e.target.style.background = active ? '#8b5cf622' : 'transparent';
+            e.target.style.color = active ? '#8b5cf6' : '#94a3b8';
+          }}
+        >
+          🧠 AI Dashboard
+        </div>
+        <div
+          key="custom-views"
+          data-testid="nav-ihss-views"
+          style={styles.menuItem(location.pathname === '/custom-views', '#10b981')}
+          onClick={() => navigate('/custom-views')}
+          onMouseEnter={(e) => { e.target.style.background = '#10b98115'; e.target.style.color = '#10b981'; }}
+          onMouseLeave={(e) => {
+            const active = location.pathname === '/custom-views';
+            e.target.style.background = active ? '#10b98122' : 'transparent';
+            e.target.style.color = active ? '#10b981' : '#94a3b8';
+          }}
+        >
+          🏠 IHSS Views
+        </div>
         {features.map((f) => (
           <div
             key={f.key}
