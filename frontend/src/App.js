@@ -4,6 +4,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import FeaturePage from './pages/FeaturePage';
 import AIDashboardPage from './pages/AIDashboardPage';
+import CustomViewsPage from './pages/CustomViewsPage';
 import Navbar from './components/Navbar';
 
 const globalStyles = `
@@ -109,6 +110,7 @@ function App() {
           <Route path="/login" element={isAuth ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
           <Route path="/" element={isAuth ? <Dashboard features={features} /> : <Navigate to="/login" />} />
           <Route path="/ai-dashboard" element={isAuth ? <AIDashboardPage /> : <Navigate to="/login" />} />
+          <Route path="/custom-views" element={isAuth ? <CustomViewsPage /> : <Navigate to="/login" />} />
           {features.map((f) => (
             <Route key={f.key} path={`/${f.key}`} element={isAuth ? <FeaturePage feature={f} /> : <Navigate to="/login" />} />
           ))}

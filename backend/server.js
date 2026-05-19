@@ -31,6 +31,9 @@ app.use('/api/labor-compliance', require('./routes/laborCompliance'));
 app.use('/api/ai-dashboard', require('./routes/aiDashboard'));
 app.use('/api/schedule-optimizer', require('./routes/scheduleOptimizer')); app.use('/api/turnover-risk', require('./routes/turnoverRisk')); app.use('/api/mobile', require('./routes/mobileSelfService')); app.use('/api/hris', require('./routes/hrisSync')); app.use('/api/labor-cost', require('./routes/laborCostDashboard')); app.use('/api/voice-checkin', require('./routes/voiceCheckIn'));
 
+// Custom Views — IHSS-specific 4 features (mounted BEFORE 404/health)
+app.use('/api/custom-views', require('./routes/customViews'));
+
 // Health check
 app.get('/api/health', (req, res) => res.json({ status: 'ok', timestamp: new Date() }));
 

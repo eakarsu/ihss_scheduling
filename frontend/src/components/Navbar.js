@@ -97,6 +97,20 @@ export default function Navbar({ onLogout, features }) {
         >
           🧠 AI Dashboard
         </div>
+        <div
+          key="custom-views"
+          data-testid="nav-ihss-views"
+          style={styles.menuItem(location.pathname === '/custom-views', '#10b981')}
+          onClick={() => navigate('/custom-views')}
+          onMouseEnter={(e) => { e.target.style.background = '#10b98115'; e.target.style.color = '#10b981'; }}
+          onMouseLeave={(e) => {
+            const active = location.pathname === '/custom-views';
+            e.target.style.background = active ? '#10b98122' : 'transparent';
+            e.target.style.color = active ? '#10b981' : '#94a3b8';
+          }}
+        >
+          🏠 IHSS Views
+        </div>
         {features.map((f) => (
           <div
             key={f.key}
