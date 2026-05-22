@@ -27,6 +27,7 @@ app.use('/api/performance', require('./routes/performance'));
 app.use('/api/incidents', require('./routes/incidents'));
 app.use('/api/swap-requests', require('./routes/swapRequests'));
 app.use('/api/labor-compliance', require('./routes/laborCompliance'));
+app.use('/api/continuity-of-care', require('./routes/continuityOfCare'));
 // Apply pass 4 — aggregate AI dashboard + per-store turnover roll-up
 app.use('/api/ai-dashboard', require('./routes/aiDashboard'));
 app.use('/api/schedule-optimizer', require('./routes/scheduleOptimizer')); app.use('/api/turnover-risk', require('./routes/turnoverRisk')); app.use('/api/mobile', require('./routes/mobileSelfService')); app.use('/api/hris', require('./routes/hrisSync')); app.use('/api/labor-cost', require('./routes/laborCostDashboard')); app.use('/api/voice-checkin', require('./routes/voiceCheckIn'));

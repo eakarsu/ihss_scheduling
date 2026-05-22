@@ -7,6 +7,11 @@ import AIDashboardPage from './pages/AIDashboardPage';
 import CustomViewsPage from './pages/CustomViewsPage';
 import Navbar from './components/Navbar';
 
+import CodexCustomVizFeature from './pages/CodexCustomVizFeature';
+import CodexOperationsFeature from './pages/CodexOperationsFeature';
+
+import TimelineView from './pages/TimelineView';
+
 const globalStyles = `
   * { margin: 0; padding: 0; box-sizing: border-box; }
   body {
@@ -79,6 +84,9 @@ const features = [
     columns: ['store_name','compliance_type','regulation','description','audit_date','auditor','result','corrective_action','deadline','status','notes'],
     tableColumns: ['store_name','compliance_type','regulation','result','deadline','status'],
     ai: { endpoint: '/labor-compliance/ai-audit', fields: ['store_name','state','employee_count','issues'], title: 'AI Labor Compliance Audit' } },
+  { key: 'continuity-of-care', label: 'Continuity of Care', icon: '🤝', color: '#0d9488', api: '/continuity-of-care',
+    columns: ['client_name','caregiver_name','continuity_score','weekly_hours','backup_gap','status'],
+    tableColumns: ['client_name','caregiver_name','continuity_score','weekly_hours','backup_gap','status'] },
   { key: 'compliance-early-warning', label: 'AI Compliance Early Warning', icon: '⚠️', color: '#d97706', api: '/labor-compliance',
     columns: ['store_name','compliance_type','regulation','description','audit_date','auditor','result','corrective_action','deadline','status','notes'],
     tableColumns: ['store_name','compliance_type','regulation','result','deadline','status'],
@@ -107,6 +115,10 @@ function App() {
       <Router>
         {isAuth && <Navbar onLogout={handleLogout} features={features} />}
         <Routes>
+        <Route path="/insights/timeline" element={<TimelineView />} />
+        <Route path="/codex/custom-viz" element={<CodexCustomVizFeature />} />
+        <Route path="/codex/operations" element={<CodexOperationsFeature />} />
+
           <Route path="/login" element={isAuth ? <Navigate to="/" /> : <Login onLogin={handleLogin} />} />
           <Route path="/" element={isAuth ? <Dashboard features={features} /> : <Navigate to="/login" />} />
           <Route path="/ai-dashboard" element={isAuth ? <AIDashboardPage /> : <Navigate to="/login" />} />
