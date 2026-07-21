@@ -1,42 +1,29 @@
 const router = require('express').Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
-const pool = require('../db');
-require('dotenv').config({ path: __dirname + '/../../.env' });
+const rateLimit = require('express-rate-limit');
+const { getPool } = require('../db');
+const { loadConfig } = require('../config');
+const authenticate = require('../middleware/auth');
 
-router.post('/register', async (req, res) => {
+router.use(rateLimit({ windowMs: 60_000, limit: 10, standardHeaders: true, legacyHeaders: false }));
+router.post('/register', (_req, res) => res.status(410).json({ error: 'Public registration is disabled; use explicit administrator provisioning' }));
+router.post('/login', async (req, res, next) => {
   try {
-    const { name, email, password, role } = req.body;
-    const hash = await bcrypt.hash(password, 10);
-    const result = await pool.query(
-      'INSERT INTO users (name, email, password, role) VALUES ($1,$2,$3,$4) RETURNING id, name, email, role',
-      [name, email, hash, role || 'manager']
+    const { organizationId, tenant, tenantSlug, email, password } = req.body || {};
+    const organization = organizationId || tenantSlug || tenant;
+    if (!organization || !email || typeof password !== 'string') return res.status(400).json({ error: 'Organization, email, and password are required' });
+    const result = await getPool().query(
+      `SELECT users.* FROM users JOIN organizations ON organizations.id=users.organization_id
+       WHERE (organizations.id::text=$1 OR organizations.name=$1) AND lower(users.email)=lower($2)`,
+      [organization, email],
     );
-    res.json(result.rows[0]);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-router.post('/login', async (req, res) => {
-  try {
-    const { email, password } = req.body;
-    const result = await pool.query('SELECT * FROM users WHERE email=$1', [email]);
-    if (result.rows.length === 0) return res.status(401).json({ error: 'Invalid credentials' });
-
     const user = result.rows[0];
-    const valid = await bcrypt.compare(password, user.password);
-    if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
-
-    const token = jwt.sign(
-      { id: user.id, email: user.email, name: user.name, role: user.role },
-      process.env.JWT_SECRET,
-      { expiresIn: '24h' }
-    );
-    res.json({ token, user: { id: user.id, name: user.name, email: user.email, role: user.role } });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
+    if (!user || !user.active || !await bcrypt.compare(password, user.password_hash)) return res.status(401).json({ error: 'Invalid credentials' });
+    const config = loadConfig();
+    const token = jwt.sign({ organizationId: user.organization_id, tokenVersion: user.token_version }, config.jwtSecret, { subject: user.id, algorithm: 'HS256', issuer: config.issuer, audience: config.audience, expiresIn: '15m' });
+    res.json({ token, user: { id: user.id, organizationId: user.organization_id, name: user.name, email: user.email, role: user.role } });
+  } catch (error) { next(error); }
 });
-
+router.get('/me', authenticate, (req, res) => res.json({ user: req.user }));
 module.exports = router;

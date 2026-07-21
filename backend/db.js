@@ -1,12 +1,18 @@
 const { Pool } = require('pg');
-require('dotenv').config({ path: __dirname + '/../.env' });
+const { loadConfig } = require('./config');
 
-const pool = new Pool({
-  host: process.env.DB_HOST || 'localhost',
-  port: process.env.DB_PORT || 5432,
-  database: process.env.DB_NAME || 'ihss_scheduling',
-  user: process.env.DB_USER || 'postgres',
-  password: process.env.DB_PASSWORD || 'postgres',
-});
+let pool;
+function getPool() {
+  if (!pool) {
+    const config = loadConfig();
+    pool = new Pool({ connectionString: config.databaseUrl, ssl: config.databaseSsl ? { rejectUnauthorized: true } : false, max: 10 });
+  }
+  return pool;
+}
 
-module.exports = pool;
+async function closePool() {
+  if (pool) await pool.end();
+  pool = undefined;
+}
+
+module.exports = { getPool, closePool };

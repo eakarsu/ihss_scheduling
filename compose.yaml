@@ -1,0 +1,44 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: ihss
+      POSTGRES_USER: ihss
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?set POSTGRES_PASSWORD}
+    volumes:
+      - ihss_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ihss -d ihss"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+  migrate:
+    build: .
+    command: ["node", "backend/scripts/migrate.js"]
+    environment: &app_env
+      DATABASE_URL: postgresql://ihss:${POSTGRES_PASSWORD}@postgres:5432/ihss
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET}
+      AUDIT_SIGNING_KEY: ${AUDIT_SIGNING_KEY:?set AUDIT_SIGNING_KEY}
+      PHI_ENCRYPTION_KEY_BASE64: ${PHI_ENCRYPTION_KEY_BASE64:?set PHI_ENCRYPTION_KEY_BASE64}
+      CORS_ORIGINS: ${CORS_ORIGINS:?set CORS_ORIGINS}
+    depends_on:
+      postgres:
+        condition: service_healthy
+  api:
+    build: .
+    read_only: true
+    tmpfs: [/tmp]
+    cap_drop: [ALL]
+    security_opt: [no-new-privileges:true]
+    environment: *app_env
+    depends_on:
+      migrate:
+        condition: service_completed_successfully
+    ports: ["127.0.0.1:4001:4001"]
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:4001/api/health"]
+      interval: 10s
+      timeout: 3s
+      retries: 10
+volumes:
+  ihss_data:
