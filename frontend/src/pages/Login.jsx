@@ -98,6 +98,15 @@ export default function Login({ onLogin }) {
             <input style={styles.input} type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="Enter your password" required
               onFocus={(e) => e.target.style.borderColor = '#f59e0b'} onBlur={(e) => e.target.style.borderColor = '#334155'} />
           </div>
+          <button
+            type="button"
+            onClick={() => { setEmail(import.meta.env.VITE_DEMO_EMAIL || ''); setPassword(import.meta.env.VITE_DEMO_PASSWORD || ''); }}
+            disabled={!import.meta.env.VITE_DEMO_EMAIL || !import.meta.env.VITE_DEMO_PASSWORD}
+            aria-label="Auto Fill Demo Credentials"
+            style={{ width: '100%', marginBottom: '12px', padding: '10px 14px', borderRadius: '8px', border: '1px solid currentColor', background: 'transparent', cursor: 'pointer' }}
+          >
+            Auto Fill Demo Credentials
+          </button>
           <button type="submit" style={{ ...styles.btn, opacity: loading ? 0.7 : 1 }} disabled={loading}>
             {loading ? 'Signing in...' : 'Sign In'}
           </button>
