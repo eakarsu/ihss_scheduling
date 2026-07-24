@@ -16,6 +16,7 @@ function createApp() {
   app.use(express.json({ limit: '256kb', strict: true }));
   app.use('/api/auth', require('./routes/auth'));
   app.use('/api/care', require('./routes/care'));
+  app.use('/api/ai', require('./routes/ai'));
   app.get('/api/health', async (_req, res) => {
     const result = await getPool().query("SELECT EXISTS(SELECT 1 FROM schema_migrations WHERE version='001_governed_care') AS migrated");
     res.status(result.rows[0].migrated ? 200 : 503).json({ status: result.rows[0].migrated ? 'ready' : 'migration_required' });
