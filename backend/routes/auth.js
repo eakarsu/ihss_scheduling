@@ -6,6 +6,22 @@ const { getPool } = require('../db');
 const { loadConfig } = require('../config');
 const authenticate = require('../middleware/auth');
 
+router.get('/demo-credentials', async (_req, res, next) => {
+  try {
+    if (process.env.NODE_ENV === 'production' || (process.env.ENABLE_DEMO_CREDENTIAL_AUTOFILL || 'true') !== 'true') {
+      return res.status(404).json({ error: 'Not found' });
+    }
+    const email = String(process.env.PROVISION_ADMIN_EMAIL || process.env.DEMO_EMAIL || '').trim().toLowerCase();
+    const password = String(process.env.PROVISION_ADMIN_PASSWORD || process.env.DEMO_PASSWORD || '');
+    if (!email || !password) return res.status(404).json({ error: 'Demo credentials are unavailable' });
+    const account = (await getPool().query(
+      'SELECT organization_id FROM users WHERE lower(email)=lower($1) AND active=TRUE ORDER BY created_at DESC LIMIT 1',
+      [email],
+    )).rows[0];
+    if (!account) return res.status(404).json({ error: 'Demo account is not provisioned' });
+    res.set('Cache-Control', 'no-store').json({ organizationId: account.organization_id, email, password });
+  } catch (error) { next(error); }
+});
 router.use(rateLimit({ windowMs: 60_000, limit: 10, standardHeaders: true, legacyHeaders: false }));
 router.post('/register', (_req, res) => res.status(410).json({ error: 'Public registration is disabled; use explicit administrator provisioning' }));
 router.post('/login', async (req, res, next) => {

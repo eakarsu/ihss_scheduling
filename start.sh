@@ -112,6 +112,9 @@ for assigned_port in "$api_port" "$ui_port"; do
     exit 1
   fi
 done
+if [ "${NODE_ENV:-development}" != production ] && [ "${ENABLE_DEMO_CREDENTIAL_AUTOFILL:-true}" = true ]; then
+  node backend/scripts/create-admin.js
+fi
 
 child_pids=""
 cleanup() {
