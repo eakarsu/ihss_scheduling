@@ -113,10 +113,10 @@ export default function Login({ onLogin }) {
           <button
             type="button"
             onClick={handleDemoFill}
-            aria-label="Auto Fill Demo Credentials"
+            aria-label="Fill demo credentials"
             style={{ width: '100%', marginBottom: '12px', padding: '10px 14px', borderRadius: '8px', border: '1px solid currentColor', background: 'transparent', cursor: 'pointer' }}
           >
-            Auto Fill Demo Credentials
+            Fill demo credentials
           </button>
           <button type="submit" style={{ ...styles.btn, opacity: loading ? 0.7 : 1 }} disabled={loading}>
             {loading ? 'Signing in...' : 'Sign In'}

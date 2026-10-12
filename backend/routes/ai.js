@@ -7,6 +7,19 @@ const { requestOperationalReadiness } = require('../lib/openrouter');
 
 router.use(auth);
 
+router.get('/operational-readiness/history', async (req, res, next) => {
+  try {
+    const rows = (await getPool().query(
+      `SELECT id, created_at, evidence->'result' AS result, evidence->'providerReceipt' AS provider_receipt
+       FROM provider_events
+       WHERE organization_id=$1 AND provider='openrouter' AND outcome='SUCCEEDED' AND evidence ? 'result'
+       ORDER BY created_at DESC LIMIT 20`,
+      [req.user.organization_id],
+    )).rows;
+    res.json(rows.map((row) => ({ analysisId: row.id, createdAt: row.created_at, result: row.result, providerReceipt: row.provider_receipt })));
+  } catch (error) { next(error); }
+});
+
 router.post('/operational-readiness', async (req, res, next) => {
   const workflowSummary = typeof req.body?.workflowSummary === 'string' ? req.body.workflowSummary.trim() : '';
   if (workflowSummary.length < 10 || workflowSummary.length > 1000) {

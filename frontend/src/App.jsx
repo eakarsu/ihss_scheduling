@@ -1,3 +1,4 @@
+import NativeAIReadiness from './pages/NativeAIReadiness';
 import { useState } from 'react';
 import Login from './pages/Login.jsx';
 import CareOperations from './pages/CareOperations.jsx';
@@ -12,5 +13,5 @@ export default function App() {
     try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; }
   });
   function logout() { localStorage.removeItem('token'); localStorage.removeItem('user'); setSession(null); }
-  return <><style>{styles}</style>{session ? <CareOperations user={session} onLogout={logout}/> : <Login onLogin={() => setSession(JSON.parse(localStorage.getItem('user')))}/>}</>;
+  return <><style>{styles}</style>{session ? <><nav><a href="#ai-readiness">AI workspace</a></nav><CareOperations user={session} onLogout={logout}/><NativeAIReadiness/></> : <Login onLogin={() => setSession(JSON.parse(localStorage.getItem('user')))}/>}</>;
 }
